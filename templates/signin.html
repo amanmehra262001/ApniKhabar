@@ -45,8 +45,19 @@
     </header>
 
     <main>
-        <div class="container">
-            <form action="/signin" method="POST" style="width: 50vw; min-width: 350px; margin-top: 3vh;">
+        <div class="container" style="width: 50vw; min-width: 350px; margin-top: 3vh;">
+            <form action="/signin" method="POST">
+                {% if occupied %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>create a login system here since password and uname matched</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% else %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>New account created successfully</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %}
                 <div class="mb-3">
                     <label for="uname" class="form-label">Username</label>
                     <input type="text" class="form-control" id="uname" name="uname" aria-describedby="emailHelp">
@@ -72,8 +83,9 @@
 
                     </div>
                     <button type="submit" class="btn btn-success">Submit</button>
+                </div>
             </form>
-            </div>
+        </div>
     </main>
     <!-- Optional JavaScript; choose one of the two! -->
 

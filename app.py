@@ -1,5 +1,4 @@
-import email
-from pyexpat import model
+
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -19,7 +18,7 @@ class User(db.Model):
     date_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self) -> str:
-        return f"{self.uname} - {self.email}"
+        return f"{self.uname}-{self.mail}"
 
 
 Pokemons = ["Pikachu", "Charizard", "Squirtle", "Jigglypuff",
@@ -36,19 +35,34 @@ def about(name=None):
     return render_template('about.html', name=name)
 
 
-@app.route("/signin", methods=['GET', 'POST'])
+@app.route("/signin")
 def signin():
-    if request.method == 'POST':
-        uname = (request.form['uname'])
-        mail = (request.form['mail'])
-        paswrd = (request.form['paswrd'])
-        user = User(uname=uname, mail=mail, paswrd=paswrd)
-        db.session.add(user)
-        # db.session.delete(model object)
-        db.session.commit()
-    createdUser = User.query.all()
     return render_template('signin.html')
 
 
+@app.route("/signin", methods=['GET', 'POST'])
+def checksignin():
+    occupied = False
+    uname = request.form['uname']
+    pss = request.form['paswrd']
+    # print(pss)
+    user = User.query.filter(User.uname == uname).first()
+    # print(user.paswrd)
+    if user:
+        if pss == user.paswrd:
+            occupied = True
+
+    else:
+        if request.method == 'POST':
+            uname = (request.form['uname'])
+            mail = (request.form['mail'])
+            paswrd = (request.form['paswrd'])
+            user = User(uname=uname, mail=mail, paswrd=paswrd)
+            db.session.add(user)
+            db.session.commit()
+            occupied = False
+    return render_template('signin.html', occupied=occupied)
+
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
