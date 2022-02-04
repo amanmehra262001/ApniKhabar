@@ -6,7 +6,6 @@
 #cntnrdiv1 {
     width: 35vw;
     min-width: 350px;
-    background-color: rgb(248, 240, 230);
     display: flex;
     flex-direction: column;
     padding-right: 10px;
@@ -16,12 +15,10 @@
 #cntnrdiv2 {
     width: 60vw;
     min-width: 350px;
-    /* background-color: green; */
 }
 
 #cntnrdiv1d1 {
     display: flex;
-    background-color: white;
 }
 
 

@@ -7,9 +7,9 @@
     <div class="p-2 w-50 bd-highlight" style="background-color:green;">Flex item 3</div> -->
     <div id="cntnrdiv1" class="rounded-3">
         <h2 style="text-align: center; " class="py-2">Today's Top 10!</h2>
-        <div style="height: 100vh; overflow-y: scroll; direction: rtl;">
-            {%for i in range(0, len)%}
-            <div id="cntnrdiv1d1" class="nav nav-pills flex-sm-row ms-2 p-4 border rounded-pill border-2" style="direction: ltr;">
+        <div style="height: 101vh; overflow-y: scroll; direction: rtl;">
+            {%for i in range(0,10)%}
+            <div id="cntnrdiv1d1" class="nav nav-pills flex-sm-row ms-2 p-4 border rounded-1 border-2" style="direction: ltr; background-color: ghostwhite;">
 
                 <img id="TTTimg" src="/static/585e4bf3cb11b227491c339a.png" width="42vw">
                 <p>This is a description of the image</p>
@@ -21,11 +21,11 @@
     <!----------------------------------------------------------------------------------------->
     <div>
         <h2 style="text-align: center; " class="py-2">For You</h2>
-        <div style="width: 60vw; min-width: 350px; margin-left:2vw; margin-top:5vh;">
+        <div style="width: 60vw; min-width: 350px; margin-left:2vw; margin-top:2vh;">
             {%for i in range(0,3)%}
-            <div class="row">
+            <div class="row my-2">
                 <div class="col-md-6">
-                    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative" style=" background-color: white;">
+                    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative" style="  background-color: ghostwhite;height: 31vh;">
                         <div class="col p-4 d-flex flex-column position-static">
                             <strong class="d-inline-block mb-2 text-primary">World</strong>
                             <h3 class="mb-0">Featured post</h3>
@@ -41,8 +41,8 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                        <div class="col p-4 d-flex flex-column position-static" style=" background-color: white;">
+                    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative" style="  background-color: ghostwhite; height: 31vh;">
+                        <div class="col p-4 d-flex flex-column position-static">
                             <strong class="d-inline-block mb-2 text-success">Design</strong>
                             <h3 class="mb-0">Post title</h3>
                             <div class="mb-1 text-muted">Nov 11</div>

@@ -28,7 +28,7 @@ Pokemons = ["Pikachu", "Charizard", "Squirtle", "Jigglypuff",
 
 @app.route("/")
 def index():
-    return render_template('index.html', len=len(Pokemons), Pokemons=Pokemons)
+    return render_template('index.html')
 
 
 @app.route("/about")
