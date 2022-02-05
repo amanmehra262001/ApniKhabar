@@ -1,9 +1,11 @@
 
-from flask import Flask, render_template, request
+from crypt import methods
+from flask import Flask, redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = "super secret"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -23,13 +25,22 @@ class User(db.Model):
 
 @app.route("/")
 def index():
-
+    try:
+        myname = session.get('myname', None)
+    except:
+        print("error occured username not defined")
+    if myname:
+        return render_template('index.html', myname=myname)
     return render_template('index.html')
 
 
 @app.route("/about")
-def about(name=None):
-    return render_template('about.html', name=name)
+def about():
+    myname = session.get('myname', None)
+    # print(myname)
+    if myname:
+        return render_template('about.html', myname=myname)
+    return render_template('about.html')
 
 
 @app.route("/signin")
@@ -37,16 +48,19 @@ def signin():
     return render_template('signin.html')
 
 
-@app.route("/signin", methods=['GET', 'POST'])
+@app.route("/signin", methods=['POST'])
 def checksignin():
     uname = request.form['uname']
     pss = request.form['paswrd']
+    print(uname, pss)
     # print(pss)
     user = User.query.filter(User.uname == uname).first()
     # print(user.paswrd)
     if user:
         if pss == user.paswrd:
             occupied = "matched"
+            session['myname'] = uname
+            return redirect('/')
         else:
             occupied = "passnotmatched"
 
@@ -60,6 +74,12 @@ def checksignin():
             db.session.commit()
             occupied = "userregistered"
     return render_template('signin.html', occupied=occupied, user=user)
+
+
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    session.clear()
+    return redirect('/')
 
 
 if __name__ == "__main__":
