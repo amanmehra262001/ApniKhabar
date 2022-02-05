@@ -21,10 +21,6 @@ class User(db.Model):
         return f"{self.uname}-{self.mail}"
 
 
-Pokemons = ["Pikachu", "Charizard", "Squirtle", "Jigglypuff",
-            "Bulbasaur", "Gengar", "Charmander", "Mew", "Lugia", "Gyarados"]
-
-
 @app.route("/")
 def index():
 
