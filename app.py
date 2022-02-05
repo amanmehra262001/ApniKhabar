@@ -27,6 +27,7 @@ Pokemons = ["Pikachu", "Charizard", "Squirtle", "Jigglypuff",
 
 @app.route("/")
 def index():
+
     return render_template('index.html')
 
 
@@ -42,7 +43,6 @@ def signin():
 
 @app.route("/signin", methods=['GET', 'POST'])
 def checksignin():
-    occupied = False
     uname = request.form['uname']
     pss = request.form['paswrd']
     # print(pss)
@@ -50,7 +50,9 @@ def checksignin():
     # print(user.paswrd)
     if user:
         if pss == user.paswrd:
-            occupied = True
+            occupied = "matched"
+        else:
+            occupied = "passnotmatched"
 
     else:
         if request.method == 'POST':
@@ -60,8 +62,8 @@ def checksignin():
             user = User(uname=uname, mail=mail, paswrd=paswrd)
             db.session.add(user)
             db.session.commit()
-            occupied = False
-    return render_template('signin.html', occupied=occupied)
+            occupied = "userregistered"
+    return render_template('signin.html', occupied=occupied, user=user)
 
 
 if __name__ == "__main__":

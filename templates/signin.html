@@ -47,14 +47,19 @@
     <main>
         <div class="container" style="width: 50vw; min-width: 350px; margin-top: 3vh;">
             <form action="/signin" method="POST">
-                {% if occupied %}
+                {% if occupied=='matched' %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>create a login system here since password and uname matched</strong>.
+                    <strong>Welcome {{user.uname}}</strong>.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                {% else %}
+                {% elif occupied=='passnotmatched' %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Username already occupied but password not matched</strong>. Please try some other username
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% elif occupied == 'userregistered' %}
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>New account created successfully</strong>.
+                    <strong>New account created successfully</strong>. Now you can return to home page and surf your news.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endif %}
@@ -100,3 +105,13 @@
 </body>
 
 </html>
+
+
+
+<!-- 20228355 -->
+
+
+<!-- APPLICATION ID 202218360635 -->
+
+
+<!-- GRN NOO.  58478971 -->
