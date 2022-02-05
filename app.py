@@ -1,5 +1,6 @@
 
 from crypt import methods
+from enum import unique
 from flask import Flask, redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -21,7 +22,7 @@ userprefrencesstr = null
 
 
 class User(db.Model):
-    uname = db.Column(db.String(20), primary_key=True)
+    uname = db.Column(db.String(20), unique=True, primary_key=True)
     mail = db.Column(db.String(100), nullable=False)
     paswrd = db.Column(db.String(100), nullable=False)
     userprefrencesstr = db.Column(db.String(200))
