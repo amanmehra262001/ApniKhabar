@@ -60,7 +60,7 @@ def checksignin():
     global uname, mail, paswrd
     uname = request.form['uname']
     pss = request.form['paswrd']
-    print(uname, pss)
+    # print(uname, pss)
     user = User.query.filter(User.uname == uname).first()
     if user:
         if pss == user.paswrd:
@@ -101,7 +101,7 @@ def pref():
                     userprefrences.append(topics)
             except:
                 userunprefered.append(topics)
-        print(userprefrences)
+        # print(userprefrences)
         if len(userprefrences) > 0:  # if list not empty
             # converting python list to string
             userprefrencesstr = ' '.join(userprefrences)
