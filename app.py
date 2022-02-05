@@ -37,7 +37,6 @@ def index():
 @app.route("/about")
 def about():
     myname = session.get('myname', None)
-    # print(myname)
     if myname:
         return render_template('about.html', myname=myname)
     return render_template('about.html')
@@ -53,12 +52,9 @@ def checksignin():
     uname = request.form['uname']
     pss = request.form['paswrd']
     print(uname, pss)
-    # print(pss)
     user = User.query.filter(User.uname == uname).first()
-    # print(user.paswrd)
     if user:
         if pss == user.paswrd:
-            occupied = "matched"
             session['myname'] = uname
             return redirect('/')
         else:
@@ -72,7 +68,9 @@ def checksignin():
             user = User(uname=uname, mail=mail, paswrd=paswrd)
             db.session.add(user)
             db.session.commit()
-            occupied = "userregistered"
+            # occupied = "userregistered"
+            return redirect('/pref')
+
     return render_template('signin.html', occupied=occupied, user=user)
 
 
@@ -80,6 +78,24 @@ def checksignin():
 def logout():
     session.clear()
     return redirect('/')
+
+
+@app.route("/pref", methods=['GET', 'POST'])
+def pref():
+    userprefrences = []
+    userunprefered = []
+    options = ['business', 'movies', 'sports', 'cricket', 'shopping', 'international',
+               'food', 'crypto', 'web', 'education', 'lifestyle', 'inovations', ]
+    if request.method == 'POST':
+        for topics in options:
+            try:
+                if request.form[topics] == "on":
+                    userprefrences.append(topics)
+            except:
+                userunprefered.append(topics)
+        print(userprefrences)
+        return redirect('/signin')
+    return render_template('pref.html')
 
 
 if __name__ == "__main__":

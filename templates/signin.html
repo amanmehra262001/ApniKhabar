@@ -47,12 +47,7 @@
     <main>
         <div class="container" style="width: 50vw; min-width: 350px; margin-top: 3vh;">
             <form action="/signin" method="POST">
-                {% if occupied=='matched' %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Welcome {{user.uname}}</strong>.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% elif occupied=='passnotmatched' %}
+                {% if occupied=='passnotmatched'%}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     <strong>Username already occupied but password not matched</strong>. Please try some other username
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -62,7 +57,7 @@
                     <strong>New account created successfully</strong>. Please refill the form to login
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                {% endif %}
+                {%else%} {% endif %}
                 <div class="mb-3">
                     <label for="uname" class="form-label">Username</label>
                     <input type="text" class="form-control" id="uname" name="uname" aria-describedby="emailHelp">
