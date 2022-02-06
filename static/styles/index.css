@@ -19,6 +19,8 @@
 
 #cntnrdiv1d1 {
     display: flex;
+    direction: ltr;
+    background-color: ghostwhite;
 }
 
 

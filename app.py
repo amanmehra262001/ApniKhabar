@@ -1,11 +1,10 @@
-
-from crypt import methods
-from enum import unique
 from flask import Flask, redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
+from decouple import config
 from sqlalchemy import null
+from newsapi import NewsApiClient
+import json
 
 app = Flask(__name__)
 app.secret_key = "super secret"
@@ -19,6 +18,18 @@ uname = null
 paswrd = null
 mail = null
 userprefrencesstr = null
+generalprefrences = ['world', 'design', 'stocks',
+                     'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
+
+
+api_key = config('API_KEY')
+unsplash_api_key = config('UNSPLASH_API')
+unsplash_image = f"https://api.unsplash.com/search/photos/?query=office&per_page=1&client_id={unsplash_api_key}"
+newsapi = NewsApiClient(api_key=api_key)
+# top_headlines = newsapi.get_top_headlines(q='bitcoin',
+#                                           category='business',
+#                                           country='us',
+#                                           language='en')
 
 
 class User(db.Model):
@@ -34,16 +45,36 @@ class User(db.Model):
 
 @app.route("/")
 def index():
+    # print(all_articles)
+    todayTopTenarr = []
+    # # with open('news.json', 'w') as f:
+    # #     json.dump(all_articles, f)
+    # for topic in generalprefrences:
+    #     all_articles = newsapi.get_everything(q=topic,
+    #                                           sources='bbc-news,the-verge',
+    #                                           domains='bbc.co.uk,techcrunch.com',
+    #                                           from_param='2022-01-06',
+    #                                           to='2022-02-05',
+    #                                           language='en',
+    #                                           sort_by='relevancy',
+    #                                           page=2)
+    #     todayTopTenarr.append(all_articles['articles'][0]['title'])
+    #     print(topic)
+    # print(todayTopTenarr)
     try:
         myname = session.get('myname', None)
     except:
         print("error occured username not defined")
     if myname:
-        return render_template('index.html', myname=myname)
-    return render_template('index.html')
+        user = User.query.filter(User.uname == myname).first()
+        print(user.userprefrencesstr)
+        userprefrencesarr = user.userprefrencesstr.split()
+        print(userprefrencesarr)
+        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key)
+    return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key)
 
 
-@app.route("/about")
+@ app.route("/about")
 def about():
     myname = session.get('myname', None)
     if myname:
@@ -51,12 +82,12 @@ def about():
     return render_template('about.html')
 
 
-@app.route("/signin")
+@ app.route("/signin")
 def signin():
     return render_template('signin.html')
 
 
-@app.route("/signin", methods=['POST'])
+@ app.route("/signin", methods=['POST'])
 def checksignin():
     global uname, mail, paswrd
     uname = request.form['uname']
@@ -83,13 +114,13 @@ def checksignin():
     return render_template('signin.html', occupied=occupied, user=user)
 
 
-@app.route("/logout", methods=['GET', 'POST'])
+@ app.route("/logout", methods=['GET', 'POST'])
 def logout():
     session.clear()
     return redirect('/')
 
 
-@app.route("/pref", methods=['GET', 'POST'])
+@ app.route("/pref", methods=['GET', 'POST'])
 def pref():
     userprefrences = []
     userunprefered = []
@@ -100,8 +131,10 @@ def pref():
             try:
                 if request.form[topics] == "on":
                     userprefrences.append(topics)
+                else:
+                    userunprefered.append(topics)
             except:
-                userunprefered.append(topics)
+                print("some error occured")
         # print(userprefrences)
         if len(userprefrences) > 0:  # if list not empty
             # converting python list to string
