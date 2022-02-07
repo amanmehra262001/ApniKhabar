@@ -52,9 +52,9 @@
                     <strong>Username already occupied but password not matched</strong>. Please try some other username
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                {% elif occupied == 'userregistered' %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>New account created successfully</strong>. Please refill the form to login
+                {% elif occupied == 'emptysubmit' %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>No Input!</strong> given by user. Please refill the form to login
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {%else%} {% endif %}

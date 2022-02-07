@@ -1,4 +1,5 @@
-from flask import Flask, redirect, render_template, request, session
+from webbrowser import get
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from decouple import config
@@ -32,6 +33,13 @@ class User(db.Model):
         return f"{self.uname}-{self.mail}"
 
 
+# class Query(db.Model):
+#     queryfname = db.Column(db.String(20), nullable=False)
+#     querylname = db.Column(db.String(20), nullable=False)
+#     querymail = db.Column(db.String(50), nullable=False, primary_key=True)
+#     querydesc = db.Column(db.String(500), nullable=False)
+
+
 api_key = config('API_KEY')
 generalprefrences = ['world', 'design', 'stocks',
                      'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
@@ -55,6 +63,29 @@ def getimage(topicsarr, imgsrcarr):
     return imgsrcarr
 
 
+def getnews(topicsarr):
+    finalnewsarr = ['0', '1']
+    newsarr = []
+    imgsrcarr = []
+    for topic in topicsarr:
+        unsplash_image = f"https://api.unsplash.com/search/photos/?query={topic}&per_page=1&client_id={unsplash_api_key}"
+        response = urlopen(unsplash_image)
+        data_json = json.loads(response.read())
+        imgsrcarr.append(data_json['results'][0]['urls']['raw'])
+        all_articles = newsapi.get_everything(q=topic,
+                                              sources='bbc-news,the-verge',
+                                              domains='bbc.co.uk,techcrunch.com',
+                                              from_param='2022-01-08',
+                                              to='2022-02-05',
+                                              language='en',
+                                              sort_by='relevancy',
+                                              page=2)
+        newsarr.append(all_articles['articles'][0]['title'])
+    finalnewsarr[0] = newsarr
+    finalnewsarr[1] = imgsrcarr
+    return finalnewsarr
+
+
 @app.route("/")
 def index():
     # print(all_articles)
@@ -76,6 +107,7 @@ def index():
     # print(todayTopTenarr)
     todayTopTenimgsrc = getimage(generalprefrences, todayTopTenimgsrc)
     print(todayTopTenimgsrc)
+    newsarr = getnews(generalprefrences)
     try:
         myname = session.get('myname', None)
     except:
@@ -85,16 +117,17 @@ def index():
         # print(user.userprefrencesstr)
         userprefrencesarr = user.userprefrencesstr.split()
         # print(userprefrencesarr)
-        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc)
-    return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc)
+        newsarr = getnews(userprefrencesarr)
+        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr)
+    return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr)
 
 
-@ app.route("/about")
-def about():
+@ app.route("/contact")
+def contact():
     myname = session.get('myname', None)
     if myname:
-        return render_template('about.html', myname=myname)
-    return render_template('about.html')
+        return render_template('contact.html', myname=myname)
+    return render_template('contact.html')
 
 
 @ app.route("/signin")
@@ -122,17 +155,14 @@ def checksignin():
             uname = (request.form['uname'])
             mail = (request.form['mail'])
             paswrd = (request.form['paswrd'])
-
-            # occupied = "userregistered"
-            return redirect('/pref')
+            print(uname)
+            if uname == "":
+                if paswrd == "":
+                    occupied = "emptysubmit"
+            else:
+                return redirect(url_for('pref'))
 
     return render_template('signin.html', occupied=occupied, user=user)
-
-
-@ app.route("/logout", methods=['GET', 'POST'])
-def logout():
-    session.clear()
-    return redirect('/')
 
 
 @ app.route("/pref", methods=['GET', 'POST'])
@@ -161,8 +191,14 @@ def pref():
         db.session.add(user)
         db.session.commit()
         # print(userprefrencesstr)
-        return redirect('/signin')
+        return redirect(url_for('signin'))
     return render_template('pref.html')
+
+
+@ app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    session.clear()
+    return redirect('/')
 
 
 # business movies shopping crypto inovations

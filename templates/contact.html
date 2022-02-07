@@ -1,0 +1,20 @@
+{% extends "basic.html" %} {% block title %} Contact {%endblock%} {% block body %}
+<div class="container" style="margin-top:5vh; width: 70vw;">
+    <div class="row">
+        <div class="col mb-4">
+            <input type="text" class="form-control" placeholder="First name" aria-label="First name" id="queryfname" name="queryfname">
+        </div>
+        <div class="col mb-4">
+            <input type="text" class="form-control" placeholder="Last name" aria-label="Last name" id="querylname" name="querylname">
+        </div>
+    </div>
+    <div class="mb-4">
+        <label for="formGroupExampleInput" class="form-label">Email</label>
+        <input type="text" class="form-control" id="querymail" name="querymail" placeholder="We won't share it with any one">
+    </div>
+    <div class="mb-4">
+        <label for="formGroupExampleInput2" class="form-label">Query</label>
+        <textarea type="text" class="form-control" id="querydesc" name="querydesc" placeholder="Describe your Query!"></textarea>
+    </div>
+    <button type="submit" class="btn btn-outline-success">Submit</button>
+</div>{%endblock%}
