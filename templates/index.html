@@ -10,10 +10,10 @@
         <div style="height: 101vh; overflow-y: scroll; direction: rtl;">
             {%for i in range(0,10)%}
             <div id="cntnrdiv1d1" class=" d-flex flex-row ms-2 p-4 border rounded-1 border-2">
-                <div class="container" id="TTTimg"><img src="{{url_for('static', filename='585e4bf3cb11b227491c339a.png')}}" width="42vw"></div>
-                <div class="container" style="background-color: aqua;">
-                    <!-- <p>{{todayTopTenarr[i]}}</p> -->
-                    <p>ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff</p>
+                <div class="container" id="TTTimg"><img src="{{todayTopTenimgsrc[i]}}" style="justify-self: center;" width="42vw"></div>
+                <div class="container">
+                    <p>{{todayTopTenarr[i]}}</p>
+
                 </div>
 
 
@@ -223,30 +223,5 @@
     <!-- unsplashapilink----------------https://api.unsplash.com/search/photos/?query=office&per_page=1&client_id={{unsplash_api}} -->
 </div>
 
-<!-- 
-{% block js %}
-<script>
-    window.onload = loading();
 
-    function loading() {
-        console.log("loading function")
-        var finalURL = loadImg();
-        console.log(finalURL);
-
-    }
-
-    function loadImg() {
-        const url = 'https://api.unsplash.com/search/photos/?query=office&per_page=1&client_id={{unsplash_api_key}}';
-        fetch(url)
-            // console.log(result)
-            .then(result => result.json())
-            .then((output) => {
-                console.log(output);
-                return (output['results'][0]['urls']['raw']);
-                // console.log(output['results'][0]['urls']['raw'])
-            })
-    }
-    // console.log(document.getElementById('TTTimg').innerHTML)=""
-</script>
-{%endblock js%} -->
 {%endblock%}

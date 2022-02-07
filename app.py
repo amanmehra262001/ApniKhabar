@@ -5,6 +5,7 @@ from decouple import config
 from sqlalchemy import null
 from newsapi import NewsApiClient
 import json
+from urllib.request import urlopen
 
 app = Flask(__name__)
 app.secret_key = "super secret"
@@ -18,18 +19,6 @@ uname = null
 paswrd = null
 mail = null
 userprefrencesstr = null
-generalprefrences = ['world', 'design', 'stocks',
-                     'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
-
-
-api_key = config('API_KEY')
-unsplash_api_key = config('UNSPLASH_API')
-unsplash_image = f"https://api.unsplash.com/search/photos/?query=office&per_page=1&client_id={unsplash_api_key}"
-newsapi = NewsApiClient(api_key=api_key)
-# top_headlines = newsapi.get_top_headlines(q='bitcoin',
-#                                           category='business',
-#                                           country='us',
-#                                           language='en')
 
 
 class User(db.Model):
@@ -43,35 +32,61 @@ class User(db.Model):
         return f"{self.uname}-{self.mail}"
 
 
+api_key = config('API_KEY')
+generalprefrences = ['world', 'design', 'stocks',
+                     'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
+newsapi = NewsApiClient(api_key=api_key)
+
+#######################
+unsplash_api_key = config('UNSPLASH_API')
+
+
+def getimage(topicsarr, imgsrcarr):
+    imgsrcarr = []
+    for topic in topicsarr:
+        unsplash_image = f"https://api.unsplash.com/search/photos/?query={topic}&per_page=1&client_id={unsplash_api_key}"
+        # store the response of URL
+        response = urlopen(unsplash_image)
+        # # storing the JSON response
+        # # from url in data
+        data_json = json.loads(response.read())
+        # # print the json response
+        imgsrcarr.append(data_json['results'][0]['urls']['raw'])
+    return imgsrcarr
+
+
 @app.route("/")
 def index():
     # print(all_articles)
     todayTopTenarr = []
-    # # with open('news.json', 'w') as f:
-    # #     json.dump(all_articles, f)
-    # for topic in generalprefrences:
-    #     all_articles = newsapi.get_everything(q=topic,
-    #                                           sources='bbc-news,the-verge',
-    #                                           domains='bbc.co.uk,techcrunch.com',
-    #                                           from_param='2022-01-06',
-    #                                           to='2022-02-05',
-    #                                           language='en',
-    #                                           sort_by='relevancy',
-    #                                           page=2)
-    #     todayTopTenarr.append(all_articles['articles'][0]['title'])
-    #     print(topic)
+    todayTopTenimgsrc = []
+    # with open('news.json', 'w') as f:
+    #     json.dump(all_articles, f)
+    for topic in generalprefrences:
+        all_articles = newsapi.get_everything(q=topic,
+                                              sources='bbc-news,the-verge',
+                                              domains='bbc.co.uk,techcrunch.com',
+                                              from_param='2022-01-08',
+                                              to='2022-02-05',
+                                              language='en',
+                                              sort_by='relevancy',
+                                              page=2)
+        todayTopTenarr.append(all_articles['articles'][0]['title'])
+        print(topic)
     # print(todayTopTenarr)
+    todayTopTenimgsrc = getimage(generalprefrences, todayTopTenimgsrc)
+    print(todayTopTenimgsrc)
     try:
         myname = session.get('myname', None)
     except:
         print("error occured username not defined")
     if myname:
         user = User.query.filter(User.uname == myname).first()
-        print(user.userprefrencesstr)
+        # print(user.userprefrencesstr)
         userprefrencesarr = user.userprefrencesstr.split()
-        print(userprefrencesarr)
-        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key)
-    return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key)
+        # print(userprefrencesarr)
+        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc)
+    return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc)
 
 
 @ app.route("/about")
