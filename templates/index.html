@@ -9,16 +9,14 @@
         <h2 style="text-align: center; " class="py-2">Today's Top 10!</h2>
         <div style="height: 101vh; overflow-y: scroll; direction: rtl;">
             {%for i in range(0,10)%}
-            <div id="cntnrdiv1d1" class=" d-flex flex-row ms-2 p-4 border rounded-1 border-2">
-                <div class="container" id="TTTimg"><img src="{{todayTopTenimgsrc[i]}}" style="justify-self: center;" width="42vw"></div>
-                <div class="container">
-                    <p>{{todayTopTenarr[i]}}</p>
-
+            <a href="{{todayTopTenlinks[i]}}">
+                <div id="cntnrdiv1d1" class=" d-flex flex-row ms-2 p-4 border rounded-1 border-2">
+                    <div class="container" id="TTTimg"><img src="{{todayTopTenimgsrc[i]}}" style="justify-self: center;" width="42vw"></div>
+                    <div class="container">
+                        <p>{{todayTopTenarr[i]}}</p>
+                    </div>
                 </div>
-
-
-
-            </div>
+            </a>
             {%endfor%}
         </div>
     </div>
@@ -34,7 +32,7 @@
                     <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative " style=" background-color: ghostwhite;height: 31vh; ">
                         <div class="col p-4 d-flex flex-column position-static ">
                             <strong class="d-inline-block mb-2 text-primary ">{{userprefrencesarr[i]}}</strong>
-                            <h5 class="mb-0 ">{{newsarr[0][i]}}</h5>
+                            <h5 class="mb-0 ">{{newsarr[i]}}</h5>
                             <a href={{foryoulink[i]}} class="stretched-link ">Continue reading</a>
                         </div>
                         <div class="col-auto d-none d-lg-block ">
@@ -60,7 +58,7 @@
                     <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative " style=" background-color: ghostwhite; height: 31vh; ">
                         <div class="col p-4 d-flex flex-column position-static ">
                             <strong class="d-inline-block mb-2 text-success ">{{userprefrencesarr[i+1]}}</strong>
-                            <h5 class="mb-0 ">{{newsarr[0][i+1]}}</h5>
+                            <h5 class="mb-0 ">{{newsarr[i+1]}}</h5>
                             <a href={{foryoulink[i+1]}} class="stretched-link ">Continue reading</a>
                         </div>
                         <div class="col-auto d-none d-lg-block ">
