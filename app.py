@@ -4,19 +4,18 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from decouple import config
 from sqlalchemy import null
+from newsapi import NewsApiClient
 # from newsdataapi import NewsDataApiClient
-from newscatcherapi import NewsCatcherApiClient
+# from newscatcherapi import NewsCatcherApiClient
 import json
-from urllib.request import urlopen
+# from urllib.request import urlopen
 # import http.client
 # import urllib.parse
 
 app = Flask(__name__)
 app.secret_key = "super secret"
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
 uname = null
@@ -43,98 +42,44 @@ class User(db.Model):
 #     querydesc = db.Column(db.String(500), nullable=False)
 
 
-api_key = config('NEWSCATCHER_API_KEY')
-generalprefrences = ['world', 'design', 'stocks',
-                     'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
+api_key = config('NEWS_API_API_KEY')
 # newsapi = NewsDataApiClient(apikey=api_key)
-# newsapi = NewsApiClient(apikey=api_key)
-newsapi = NewsCatcherApiClient(x_api_key=api_key)
-
+newsapi = NewsApiClient(api_key=api_key)
+# newsapi = NewsCatcherApiClient(x_api_key=api_key)
 #######################
 unsplash_api_key = config('UNSPLASH_API')
 
-
-def getimage(topicsarr, imgsrcarr):
-    imgsrcarr = []
-    for topic in topicsarr:
-        unsplash_image = f"https://api.unsplash.com/search/photos/?query={topic}&per_page=1&client_id={unsplash_api_key}"
-        # store the response of URL
-        response = urlopen(unsplash_image)
-        # # storing the JSON response
-        # # from url in data
-        data_json = json.loads(response.read())
-        # # print the json response
-        imgsrcarr.append(data_json['results'][0]['urls']['raw'])
-    return imgsrcarr
-
-
-def getnews(topicsarr):
-    finalnewsarr = ['0', '1']
-    newsarr = []
-    imgsrcarr = []
-    for topic in topicsarr:
-        unsplash_image = f"https://api.unsplash.com/search/photos/?query={topic}&per_page=1&client_id={unsplash_api_key}"
-        response = urlopen(unsplash_image)
-        data_json = json.loads(response.read())
-        imgsrcarr.append(data_json['results'][0]['urls']['raw'])
-        # all_articles = newsapi.news_api(q=topic,
-        #                                 language='en')
-        all_articles = newsapi.get_search(q=topic,
-                                          lang='en',
-                                          page_size=100)
-
-        print(topic)
-
-        # all_articles = newsapi.get_everything(q=topic,
-        #                                       sources='bbc-news,the-verge',
-        #                                       domains='bbc.co.uk,techcrunch.com',
-        #                                       from_param='2022-01-08',
-        #                                       to='2022-02-05',
-        #                                       language='en',
-        #                                       sort_by='relevancy',
-        #                                       page=2)
-        if(len(all_articles['articles'][0]['title']) != 0):
-            # print(all_articles['results'][0]['title'])
-            # print(type(all_articles['results'][0]['title']))
-            newsarr.append(all_articles['articles'][0]['title'])
-        else:
-            print(f"Nothing found related to {topic}")
-
-    finalnewsarr[0] = newsarr
-    finalnewsarr[1] = imgsrcarr
-    return finalnewsarr
+# preparations...........................
+generalprefrences = ['world', 'design', 'stocks',
+                     'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
+generalprefrencenewsarr = []
+generalprefrenceimgarr = []
+generalprefrencelinkarr = []
+for topic in generalprefrences:
+    # newsData
+    # all_articles = newsapi.news_api(q=topic,
+    #                                 language='en')
+    # newscatcher
+    # all_articles = newsapi.get_search(q=topic,
+    #                                   lang='en',                                         page_size=100)
+    # newsapi
+    all_articles = newsapi.get_everything(q=topic,
+                                          language='en',
+                                          page=2)
+    # with open('news.json', 'a') as f:
+    #     json.dump(all_articles, f)
+    generalprefrencenewsarr.append(all_articles['articles'][0]['title'])
+    generalprefrenceimgarr.append(all_articles['articles'][0]['urlToImage'])
+    generalprefrencelinkarr.append(all_articles['articles'][0]['url'])
 
 
 @app.route("/")
 def index():
-    # print(all_articles)
-    todayTopTenarr = []
-    todayTopTenimgsrc = []
-    for topic in generalprefrences:
-        # all_articles = newsapi.news_api(q=topic,
-        #                                 language='en')
-        all_articles = newsapi.get_search(q=topic,
-                                          lang='en',                                         page_size=100)
-        with open('news.json', 'a') as f:
-            json.dump(all_articles, f)
-        # all_articles = newsapi.get_everything(q=topic,
-        #                                       sources='bbc-news,the-verge',
-        #                                       domains='bbc.co.uk,techcrunch.com',
-        #                                       from_param='2022-01-08',
-        #                                       to='2022-02-05',
-        #                                       language='en',
-        #                                       sort_by='relevancy',
-        #                                       page=2)
-        todayTopTenarr.append(all_articles['articles'][0]['title'])
-        print(topic)
-    # print(todayTopTenarr)
-    todayTopTenimgsrc = getimage(generalprefrences, todayTopTenimgsrc)
-    print(todayTopTenimgsrc)
-    newsarr = getnews(generalprefrences)
+    newsarr = [generalprefrencenewsarr, generalprefrenceimgarr]
     try:
         myname = session.get('myname', None)
     except:
-        print("error occured username not defined")
+        print("User not detected")
     if myname:
         foryouimg = []
         foryoulink = []
@@ -142,15 +87,22 @@ def index():
         # print(user.userprefrencesstr)
         userprefrencesarr = user.userprefrencesstr.split()
         # print(userprefrencesarr)
-        newsarr = getnews(userprefrencesarr)
-        print(newsarr)
+        # print(newsarr)
         for topic in userprefrencesarr:
-            all_articles = newsapi.get_search(q=topic,
-                                              lang='en',                                         page_size=100)
-            foryouimg.append(all_articles['articles'][0]['media'])
-            foryoulink.append(all_articles['articles'][0]['link'])
-        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr, foryouimg=foryouimg, foryoulink=foryoulink)
-    return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr)
+            print(topic)
+            if topic != 'inovations':
+                all_articles = newsapi.get_everything(q=topic,
+                                                      language='en',
+                                                      page=2)
+
+                newsarr.append(all_articles['articles'][0]['title'])
+                foryouimg.append(all_articles['articles'][0]['urlToImage'])
+                foryoulink.append(all_articles['articles'][0]['url'])
+                print(type(all_articles['articles'][0]['title']))
+            else:
+                print("nothing to show")
+        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=generalprefrencenewsarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=generalprefrenceimgarr, todayTopTenlinks=generalprefrencelinkarr, newsarr=newsarr, foryouimg=foryouimg, foryoulink=foryoulink, gforyouimg=generalprefrenceimgarr, gforyoulink=generalprefrencelinkarr)
+    return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=generalprefrencenewsarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=generalprefrenceimgarr, todayTopTenlinks=generalprefrencelinkarr, newsarr=newsarr, foryouimg=generalprefrenceimgarr, foryoulink=generalprefrencelinkarr)
 
 
 @ app.route("/contact")
