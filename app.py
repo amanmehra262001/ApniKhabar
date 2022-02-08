@@ -42,7 +42,7 @@ class User(db.Model):
 #     querydesc = db.Column(db.String(500), nullable=False)
 
 
-api_key = config('NEWS_API_API_KEY_SECOND')
+api_key = config('NEWS_API_API_KEY_FATHER')
 # newsapi = NewsDataApiClient(apikey=api_key)
 newsapi = NewsApiClient(api_key=api_key)
 # newsapi = NewsCatcherApiClient(x_api_key=api_key)
@@ -52,9 +52,13 @@ unsplash_api_key = config('UNSPLASH_API')
 # preparations...........................
 generalprefrences = ['world', 'design', 'stocks',
                      'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
+forcarousel = ['games', 'kids', 'nature', 'bitcoin', 'new', 'football']
 generalprefrencenewsarr = []
 generalprefrenceimgarr = []
 generalprefrencelinkarr = []
+forcarouselnews = []
+forcarouselimg = []
+forcarousellink = []
 for topic in generalprefrences:
     # newsData
     # all_articles = newsapi.news_api(q=topic,
@@ -69,8 +73,26 @@ for topic in generalprefrences:
     # with open('news.json', 'a') as f:
     #     json.dump(all_articles, f)
     generalprefrencenewsarr.append(all_articles['articles'][0]['title'])
-    generalprefrenceimgarr.append(all_articles['articles'][0]['urlToImage'])
+    generalprefrenceimgarr.append(
+        all_articles['articles'][0]['urlToImage'])
     generalprefrencelinkarr.append(all_articles['articles'][0]['url'])
+for topic in forcarousel:
+    # newsData
+    # all_articles = newsapi.news_api(q=topic,
+    #                                 language='en')
+    # newscatcher
+    # all_articles = newsapi.get_search(q=topic,
+    #                                   lang='en',                                         page_size=100)
+    # newsapi
+    all_articles = newsapi.get_everything(q=topic,
+                                          language='en',
+                                          page=2)
+    # with open('news.json', 'a') as f:
+    #     json.dump(all_articles, f)
+    forcarouselnews.append(all_articles['articles'][0]['title'])
+    forcarouselimg.append(
+        all_articles['articles'][0]['urlToImage'])
+    forcarousellink.append(all_articles['articles'][0]['url'])
 
 
 @app.route("/")
@@ -90,7 +112,7 @@ def index():
         # print(newsarr)
         newsarr = []
         for topic in userprefrencesarr:
-            print(topic)
+            # print(topic)
             if topic != 'inovations':
                 all_articles = newsapi.get_everything(q=topic,
                                                       language='en',
@@ -102,15 +124,16 @@ def index():
                 foryoulink.append(all_articles['articles'][0]['url'])
                 # print(type(all_articles['articles'][0]['title']))
             else:
-                all_articles = newsapi.get_everything(q='devotional',
+                all_articles = newsapi.get_everything(q='machine',
                                                       language='en',
                                                       page=2)
+                # with open('news.json', 'a') as f:
+                #     json.dump(all_articles, f)
                 newsarr.append(all_articles['articles'][0]['title'])
                 foryouimg.append(all_articles['articles'][0]['urlToImage'])
                 foryoulink.append(all_articles['articles'][0]['url'])
-            print(newsarr)
-        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=generalprefrencenewsarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=generalprefrenceimgarr, todayTopTenlinks=generalprefrencelinkarr, newsarr=newsarr, foryouimg=foryouimg, foryoulink=foryoulink, gforyouimg=generalprefrenceimgarr, gforyoulink=generalprefrencelinkarr)
-    return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=generalprefrencenewsarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=generalprefrenceimgarr, todayTopTenlinks=generalprefrencelinkarr, newsarr=newsarr, foryouimg=generalprefrenceimgarr, foryoulink=generalprefrencelinkarr)
+        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=generalprefrencenewsarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=generalprefrenceimgarr, todayTopTenlinks=generalprefrencelinkarr, newsarr=newsarr, foryouimg=foryouimg, foryoulink=foryoulink, gforyouimg=generalprefrenceimgarr, gforyoulink=generalprefrencelinkarr, forcarouselimg=forcarouselimg, forcarousellink=forcarousellink, forcarouselnews=forcarouselnews)
+    return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=generalprefrencenewsarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=generalprefrenceimgarr, todayTopTenlinks=generalprefrencelinkarr, newsarr=newsarr, foryouimg=generalprefrenceimgarr, foryoulink=generalprefrencelinkarr, forcarouselimg=forcarouselimg, forcarousellink=forcarousellink, forcarouselnews=forcarouselnews)
 
 
 @ app.route("/contact")
