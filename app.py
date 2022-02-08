@@ -1,12 +1,15 @@
-from webbrowser import get
+
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from decouple import config
 from sqlalchemy import null
-from newsapi import NewsApiClient
+# from newsdataapi import NewsDataApiClient
+from newscatcherapi import NewsCatcherApiClient
 import json
 from urllib.request import urlopen
+# import http.client
+# import urllib.parse
 
 app = Flask(__name__)
 app.secret_key = "super secret"
@@ -40,10 +43,12 @@ class User(db.Model):
 #     querydesc = db.Column(db.String(500), nullable=False)
 
 
-api_key = config('API_KEY')
+api_key = config('NEWSCATCHER_API_KEY')
 generalprefrences = ['world', 'design', 'stocks',
                      'entertainment', 'arts', 'technology', 'culture', 'photography', 'politics', 'celebrity']
-newsapi = NewsApiClient(api_key=api_key)
+# newsapi = NewsDataApiClient(apikey=api_key)
+# newsapi = NewsApiClient(apikey=api_key)
+newsapi = NewsCatcherApiClient(x_api_key=api_key)
 
 #######################
 unsplash_api_key = config('UNSPLASH_API')
@@ -72,15 +77,29 @@ def getnews(topicsarr):
         response = urlopen(unsplash_image)
         data_json = json.loads(response.read())
         imgsrcarr.append(data_json['results'][0]['urls']['raw'])
-        all_articles = newsapi.get_everything(q=topic,
-                                              sources='bbc-news,the-verge',
-                                              domains='bbc.co.uk,techcrunch.com',
-                                              from_param='2022-01-08',
-                                              to='2022-02-05',
-                                              language='en',
-                                              sort_by='relevancy',
-                                              page=2)
-        newsarr.append(all_articles['articles'][0]['title'])
+        # all_articles = newsapi.news_api(q=topic,
+        #                                 language='en')
+        all_articles = newsapi.get_search(q=topic,
+                                          lang='en',
+                                          page_size=100)
+
+        print(topic)
+
+        # all_articles = newsapi.get_everything(q=topic,
+        #                                       sources='bbc-news,the-verge',
+        #                                       domains='bbc.co.uk,techcrunch.com',
+        #                                       from_param='2022-01-08',
+        #                                       to='2022-02-05',
+        #                                       language='en',
+        #                                       sort_by='relevancy',
+        #                                       page=2)
+        if(len(all_articles['articles'][0]['title']) != 0):
+            # print(all_articles['results'][0]['title'])
+            # print(type(all_articles['results'][0]['title']))
+            newsarr.append(all_articles['articles'][0]['title'])
+        else:
+            print(f"Nothing found related to {topic}")
+
     finalnewsarr[0] = newsarr
     finalnewsarr[1] = imgsrcarr
     return finalnewsarr
@@ -91,17 +110,21 @@ def index():
     # print(all_articles)
     todayTopTenarr = []
     todayTopTenimgsrc = []
-    # with open('news.json', 'w') as f:
-    #     json.dump(all_articles, f)
     for topic in generalprefrences:
-        all_articles = newsapi.get_everything(q=topic,
-                                              sources='bbc-news,the-verge',
-                                              domains='bbc.co.uk,techcrunch.com',
-                                              from_param='2022-01-08',
-                                              to='2022-02-05',
-                                              language='en',
-                                              sort_by='relevancy',
-                                              page=2)
+        # all_articles = newsapi.news_api(q=topic,
+        #                                 language='en')
+        all_articles = newsapi.get_search(q=topic,
+                                          lang='en',                                         page_size=100)
+        with open('news.json', 'a') as f:
+            json.dump(all_articles, f)
+        # all_articles = newsapi.get_everything(q=topic,
+        #                                       sources='bbc-news,the-verge',
+        #                                       domains='bbc.co.uk,techcrunch.com',
+        #                                       from_param='2022-01-08',
+        #                                       to='2022-02-05',
+        #                                       language='en',
+        #                                       sort_by='relevancy',
+        #                                       page=2)
         todayTopTenarr.append(all_articles['articles'][0]['title'])
         print(topic)
     # print(todayTopTenarr)
@@ -113,12 +136,20 @@ def index():
     except:
         print("error occured username not defined")
     if myname:
+        foryouimg = []
+        foryoulink = []
         user = User.query.filter(User.uname == myname).first()
         # print(user.userprefrencesstr)
         userprefrencesarr = user.userprefrencesstr.split()
         # print(userprefrencesarr)
         newsarr = getnews(userprefrencesarr)
-        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr)
+        print(newsarr)
+        for topic in userprefrencesarr:
+            all_articles = newsapi.get_search(q=topic,
+                                              lang='en',                                         page_size=100)
+            foryouimg.append(all_articles['articles'][0]['media'])
+            foryoulink.append(all_articles['articles'][0]['link'])
+        return render_template('index.html', myname=myname, generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, userprefrencesarr=userprefrencesarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr, foryouimg=foryouimg, foryoulink=foryoulink)
     return render_template('index.html', generalprefrences=generalprefrences, todayTopTenarr=todayTopTenarr, unsplash_api_key=unsplash_api_key, todayTopTenimgsrc=todayTopTenimgsrc, newsarr=newsarr)
 
 
