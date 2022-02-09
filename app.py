@@ -217,4 +217,4 @@ def logout():
 
 # business movies shopping crypto inovations
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
